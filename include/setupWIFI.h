@@ -835,11 +835,17 @@ void check_firmware_updates(WebServer* activeServer) {
     HTTPClient http;
     // API GitHub pour lister le contenu du répertoire release/
     String apiUrl = "https://api.github.com/repos/Zilang59/DomoboX_Interrupteur/contents/release";
+    DEBUG_PRINT("Tentative de connexion à : ");
+    DEBUG_PRINTLN(apiUrl);
+    
     http.begin(apiUrl);
     http.addHeader("User-Agent", "ESP32-Firmware-Updater");
-    http.setTimeout(5000); // Timeout de 5 secondes
+    http.setTimeout(10000); // Augmentons le timeout à 10 secondes
     
+    DEBUG_PRINTLN("Envoi de la requête GET...");
     int httpCode = http.GET();
+    DEBUG_PRINT("Code de réponse HTTP reçu : ");
+    DEBUG_PRINTLN(httpCode);
     
     if (httpCode == 200) {
         String payload = http.getString();
