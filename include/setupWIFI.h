@@ -840,17 +840,7 @@ void check_firmware_updates(WebServer* activeServer) {
     
     http.begin(apiUrl);
     http.addHeader("User-Agent", "ESP32-Firmware-Updater");
-    
-    // Ajouter le token GitHub si défini (pour dépôt privé)
-    if (GITHUB_TOKEN != "" && GITHUB_TOKEN.length() > 0) {
-        String authHeader = "Bearer " + GITHUB_TOKEN;
-        http.addHeader("Authorization", authHeader);
-        DEBUG_PRINTLN("Token GitHub ajouté pour authentification");
-    } else {
-        DEBUG_PRINTLN("Aucun token GitHub - accès dépôt public uniquement");
-    }
-    
-    http.setTimeout(10000); // Augmentons le timeout à 10 secondes
+    http.setTimeout(10000); // Timeout de 10 secondes
     
     DEBUG_PRINTLN("Envoi de la requête GET...");
     int httpCode = http.GET();
@@ -899,8 +889,22 @@ void check_firmware_updates(WebServer* activeServer) {
             
             activeServer->send(200, "application/json", response);
         } else {
+            DEBUG_PRINTLN("Aucun firmware trouvé dans le répertoire release/");
             activeServer->send(500, "application/json", "{\"status\":\"error\",\"message\":\"Aucun firmware trouvé dans le répertoire release/\"}");
         }
+    } else if (httpCode == 404) {
+        DEBUG_PRINTLN("Dépôt ou répertoire non trouvé (404) - Vérifiez que le dépôt est public et contient le dossier release/");
+        String errorMsg = "{\"status\":\"error\",\"message\":\"Dépôt non accessible (404). Vérifiez que le dépôt GitHub est public.\"}";
+        activeServer->send(404, "application/json", errorMsg);
+    } else if (httpCode == 403) {
+        DEBUG_PRINTLN("Accès refusé (403) - Limite de débit API GitHub ou dépôt privé");
+        String errorMsg = "{\"status\":\"error\",\"message\":\"Accès refusé (403). Limite API GitHub ou dépôt privé.\"}";
+        activeServer->send(403, "application/json", errorMsg);
+    } else if (httpCode < 0) {
+        DEBUG_PRINT("Erreur de connexion : ");
+        DEBUG_PRINTLN(httpCode);
+        String errorMsg = "{\"status\":\"error\",\"message\":\"Erreur de connexion réseau (" + String(httpCode) + ")\"}";
+        activeServer->send(500, "application/json", errorMsg);
     } else {
         DEBUG_PRINT("Erreur API GitHub : ");
         DEBUG_PRINTLN(httpCode);
@@ -936,13 +940,6 @@ void update_firmware(WebServer* activeServer) {
     HTTPClient http;
     http.begin(url);
     http.setTimeout(10000); // Timeout de 10 secondes pour le téléchargement
-    
-    // Ajouter le token GitHub si défini (pour dépôt privé)
-    if (GITHUB_TOKEN != "" && GITHUB_TOKEN.length() > 0) {
-        String authHeader = "Bearer " + GITHUB_TOKEN;
-        http.addHeader("Authorization", authHeader);
-        DEBUG_PRINTLN("Token GitHub ajouté pour téléchargement");
-    }
     
     // Suivre les redirections GitHub
     http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);

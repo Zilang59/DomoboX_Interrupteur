@@ -1,8 +1,5 @@
 #include <Arduino.h>
 
-// Inclure le fichier de configuration des tokens (non versionné)
-#include "config_tokens.h"
-
 // Définition centralisée des paramètres enregistrées dans le SPIFFS (utiliser dans le script param.nomdelavariable)
     #define PARAM_LIST \
     X(bool, relais1, false) \
@@ -57,9 +54,6 @@
     bool refresh_LEDColor = false;
     bool APIUpdated = false, APIForceUpdated = false;
     String APIUpdateClock = "04:00";
-
-    // Token GitHub pour accéder au dépôt privé (configuré dans config_tokens.h)
-    String GITHUB_TOKEN = GITHUB_TOKEN_VALUE;
 
 
     bool LD2410_Setuped = false;

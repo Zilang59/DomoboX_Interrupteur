@@ -32,7 +32,6 @@ Thumbs.db
 # Fichiers de configuration locaux
 upload_port.ini
 monitor_port.ini
-config_tokens.h
 
 # Sauvegarde des paramètres (peuvent contenir des mots de passe)
 wifi_backup.json
