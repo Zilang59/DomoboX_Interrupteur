@@ -1740,16 +1740,19 @@ function checkNewFirmware() {
   const boutonUpdate = document.getElementById("bouton_update");
   const currentVersion = document.getElementById("version_num").textContent.trim();
 
+  console.log("🔍 Vérification des mises à jour en cours...");
+
   // Utilise le nouveau endpoint local qui vérifie GitHub
   fetch("/check_updates")
       .then(resp => {
+        console.log(`📡 Réponse HTTP: ${resp.status} ${resp.statusText}`);
         if (!resp.ok) {
           throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
         }
         return resp.json();
       })
       .then(data => {
-        console.log("Vérification des mises à jour:", data);
+        console.log("✅ Vérification des mises à jour:", data);
         
         if (data.status === "success" && data.update_available) {
           // Une mise à jour est disponible
@@ -1763,14 +1766,14 @@ function checkNewFirmware() {
             boutonUpdate.title = `Mise à jour vers v${data.latest_version} disponible (actuelle: v${data.current_version})`;
           }
           
-          console.log(`✅ Nouvelle version disponible: ${data.latest_version} (actuelle: ${data.current_version})`);
+          console.log(`🆕 Nouvelle version disponible: ${data.latest_version} (actuelle: ${data.current_version})`);
         } else if (data.status === "success") {
           // Pas de mise à jour disponible
           boutonUpdate.style.display = "none";
           console.log(`✅ Firmware à jour (version ${data.current_version})`);
         } else {
           // Erreur dans la réponse
-          console.log("❌ Erreur:", data.message || "Réponse inattendue");
+          console.log("❌ Erreur serveur:", data.message || "Réponse inattendue");
           boutonUpdate.style.display = "none";
         }
       })
@@ -1781,6 +1784,8 @@ function checkNewFirmware() {
         // En cas d'erreur réseau, on peut essayer de fallback sur une vérification locale
         if (error.message.includes('Failed to fetch')) {
           console.log("💡 Vérification réseau échouée - mode hors ligne");
+        } else if (error.message.includes('500')) {
+          console.log("🔧 Erreur serveur - vérifiez la connexion WiFi de l'ESP32");
         }
       });
 }

@@ -825,11 +825,19 @@ bool compareVersions(String newVersion, String currentVersion) {
 void check_firmware_updates(WebServer* activeServer) {
     DEBUG_PRINTLN("Vérification des mises à jour firmware dans le répertoire release/...");
     
+    // Vérifier si WiFi est connecté
+    if (WiFi.status() != WL_CONNECTED) {
+        DEBUG_PRINTLN("WiFi non connecté");
+        activeServer->send(500, "application/json", "{\"status\":\"error\",\"message\":\"WiFi non connecté\"}");
+        return;
+    }
+    
     HTTPClient http;
     // API GitHub pour lister le contenu du répertoire release/
     String apiUrl = "https://api.github.com/repos/Zilang59/DomoboX_Interrupteur/contents/release";
     http.begin(apiUrl);
     http.addHeader("User-Agent", "ESP32-Firmware-Updater");
+    http.setTimeout(5000); // Timeout de 5 secondes
     
     int httpCode = http.GET();
     
@@ -880,7 +888,8 @@ void check_firmware_updates(WebServer* activeServer) {
     } else {
         DEBUG_PRINT("Erreur API GitHub : ");
         DEBUG_PRINTLN(httpCode);
-        activeServer->send(500, "application/json", "{\"status\":\"error\",\"message\":\"Erreur API GitHub\"}");
+        String errorMsg = "{\"status\":\"error\",\"message\":\"Erreur API GitHub: " + String(httpCode) + "\"}";
+        activeServer->send(500, "application/json", errorMsg);
     }
     
     http.end();
@@ -890,6 +899,13 @@ void update_firmware(WebServer* activeServer) {
     String fileName = activeServer->arg("file");
     if (fileName == "") {
         activeServer->send(400, "application/json", "{\"status\":\"error\",\"message\":\"Aucun fichier fourni\"}");
+        return;
+    }
+
+    // Vérifier si WiFi est connecté
+    if (WiFi.status() != WL_CONNECTED) {
+        DEBUG_PRINTLN("WiFi non connecté");
+        activeServer->send(500, "application/json", "{\"status\":\"error\",\"message\":\"WiFi non connecté\"}");
         return;
     }
 
@@ -903,6 +919,7 @@ void update_firmware(WebServer* activeServer) {
 
     HTTPClient http;
     http.begin(url);
+    http.setTimeout(10000); // Timeout de 10 secondes pour le téléchargement
     
     // Suivre les redirections GitHub
     http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
