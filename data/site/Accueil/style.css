@@ -1,0 +1,372 @@
+* {margin: 0; padding: 0; box-sizing: border-box;}
+
+body {
+  display: flex;
+  height: 100vh;
+  font-family: sans-serif;
+  background: #f3f3f3;
+}
+
+/* --- MENU LATÉRAL --- */
+.sidebar {
+  background: #222;
+  color: #fff;
+  width: 250px;
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* prend toute la largeur */
+  height: 100%;
+  overflow: hidden;
+  justify-content: flex-start; /* tout en haut */
+  padding-bottom: 20px; /* pour laisser un peu d'espace pour le bas */
+}
+
+.menu-top {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* prend toute la largeur */
+  margin-top: 0; /* en haut */
+}
+
+.menu-bottom-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto; /* pousse tout vers le bas */
+}
+
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.logo {
+  font-size: 1.8em;
+  margin: 20px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.3s;
+  transform-origin: center;
+  display: flex;
+  justify-content: center;
+  height: 50px; /* fixe pour éviter le déplacement */
+}
+.logo:hover { transform: scale(1.1); }
+
+.menu-item {
+  width: 100%;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-item-bottom {
+  width: 100%;
+  padding: 2px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.menu-item:hover,
+.menu-item-bottom:hover {
+    background: #333;
+}
+
+
+.menu-item a,
+.menu-item-bottom a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu-item a:hover,
+.menu-item-bottom a:hover {
+    background: #333;
+}
+
+.menu-item-bottom {
+  margin-top: auto;
+}
+
+.menu-item i, .menu-item-bottom i { font-size: 1.2em; }
+.menu-item span, .menu-item-bottom span { transition: opacity 0.3s; }
+
+/* cache le texte des menus normaux et bas quand menu rétracté */
+.sidebar.collapsed .menu-item span:not(.material-icons),
+.sidebar.collapsed .menu-item-bottom span:not(.material-icons) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- CONTENU PRINCIPAL --- */
+.main {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    transition: margin-left 0.3s;
+}
+
+.main h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px; /* étroit par défaut */
+    }
+
+    .sidebar.expanded {
+        width: 250px; /* s’étend quand on clique sur le logo */
+    }
+
+    .sidebar .menu-item span:not(.material-icons),
+    .sidebar .menu-item-bottom span:not(.material-icons) {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar.expanded .menu-item span:not(.material-icons),
+    .sidebar.expanded .menu-item-bottom span:not(.material-icons) {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+.bouton {
+  cursor: pointer;
+}
+
+.wait-light {
+  margin-top: -20px;
+  margin-left: 30px;
+  color: #000000;
+  animation: spin 2s linear infinite;
+  font-size: 20px;
+  opacity: 0;              /* invisible au départ */
+  transition: opacity 0.7s ease;
+  transform-origin: center;
+  pointer-events: none;
+  display:block;
+}
+
+.wait-light.visible {
+  opacity: 1;
+}
+.wait-light.error {
+  color: red;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+
+
+.section {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px; /* limite largeur sur tablette/desktop */
+  margin: 0 auto;   /* centre sur grand écran */
+  margin-bottom: 10px;
+}
+.section h2 {
+    margin: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+.color-picker-container {
+  display: flex;       /* utilise flexbox pour aligner horizontalement */
+  gap: 5px;            /* espace entre les icônes */
+  flex-wrap: nowrap;   /* empêche le retour à la ligne */
+  align-items: center; /* aligne verticalement */
+  width:100%;
+  justify-content: center;
+}
+.color-picker-icon {
+  margin-left : 10px;
+  margin-right : 10px;
+  cursor: pointer;
+}
+.sub-icon {
+  position:relative;
+  margin-top:30px;
+  margin-left:-25px;
+  color : #858585;
+}
+.icon-on { color: gold; }
+.icon-off { color: rgb(39, 39, 39); }
+
+.icon-small { font-size: 13px; }
+.icon-medium { font-size: 24px; }
+.icon-large { font-size: 48px; }
+input.color-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+
+
+
+.toggle-container {
+    margin-top: 0px;
+    text-align: center;
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.toggle input[type="checkbox"] {
+    appearance: none;
+    width: 50px;
+    height: 25px;
+    background: #ddd;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+
+
+.toggle input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2.5px;
+    left: 3px;
+    transition: transform 0.3s;
+}
+
+.toggle input[type="checkbox"]:checked::before {
+    transform: translateX(25px);
+}
+
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.label {
+  color : black;
+}
+
+.sublabel {
+  font-size: 10px;
+  text-align: right;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.sublabel.off {
+  color: rgb(160, 160, 160);
+}
+
+.sublabel.on {
+  color: black;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .3s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #4CAF50;
+}
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+
+.spoiler-btn {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 1px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 2px;
+  width:100%;
+  font-size:12px;
+}
+
+.spoiler-btn:hover {
+  background-color: #ddd;
+}
+
+.spoiler-block {
+  display: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 5px;
+  background-color: #f9f9f9;
+  font-size: 0.9em;
+  color: #333;
+}

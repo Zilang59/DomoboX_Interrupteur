@@ -1,0 +1,24 @@
+{
+  "wifi_networks": [
+    {
+      "ssid": "Livebox-5482",
+      "mdp": "rBdRxLVutWj2sYuMzf",
+      "hostname": "Interrupteur",
+      "IP_local": "192.168.1.31",
+      "MAC_ADRESS": "10:20:BA:C5:F7:6C",
+      "DNS": "0",
+      "mDNS": "Interrupteur.local",
+      "port": "81"
+    },
+    {
+      "ssid": "Livebox-545",
+      "mdp": "rBdRxLVutWj2sYuMzf",
+      "hostname": "Interrupteur",
+      "IP_local": "192.168.1.31",
+      "MAC_ADRESS": "10:20:BA:C5:F7:6C",
+      "DNS": "0",
+      "mDNS": "Interrupteur.local",
+      "port": "81"
+    }
+  ]
+}

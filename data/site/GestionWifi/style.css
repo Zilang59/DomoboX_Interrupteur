@@ -1,0 +1,365 @@
+* {margin: 0; padding: 0; box-sizing: border-box;}
+
+body {
+  display: flex;
+  height: 100vh;
+  font-family: sans-serif;
+  background: #f3f3f3;
+}
+
+/* --- MENU LATÉRAL --- */
+.sidebar {
+  background: #222;
+  color: #fff;
+  width: 250px;
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* prend toute la largeur */
+  height: 100%;
+  overflow: hidden;
+  justify-content: flex-start; /* tout en haut */
+  padding-bottom: 20px; /* pour laisser un peu d'espace pour le bas */
+}
+
+.menu-top {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* prend toute la largeur */
+  margin-top: 0; /* en haut */
+}
+
+.menu-bottom-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto; /* pousse tout vers le bas */
+}
+
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.logo {
+  font-size: 1.8em;
+  margin: 20px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.3s;
+  transform-origin: center;
+  display: flex;
+  justify-content: center;
+  height: 50px; /* fixe pour éviter le déplacement */
+}
+.logo:hover { transform: scale(1.1); }
+
+.menu-item {
+  width: 100%;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-item-bottom {
+  width: 100%;
+  padding: 2px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.menu-item:hover,
+.menu-item-bottom:hover {
+    background: #333;
+}
+
+
+.menu-item a,
+.menu-item-bottom a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu-item a:hover,
+.menu-item-bottom a:hover {
+    background: #333;
+}
+
+.menu-item-bottom {
+  margin-top: auto;
+}
+
+.menu-item i, .menu-item-bottom i { font-size: 1.2em; }
+.menu-item span, .menu-item-bottom span { transition: opacity 0.3s; }
+
+/* cache le texte des menus normaux et bas quand menu rétracté */
+.sidebar.collapsed .menu-item span:not(.material-icons),
+.sidebar.collapsed .menu-item-bottom span:not(.material-icons) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- CONTENU PRINCIPAL --- */
+.main {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    transition: margin-left 0.3s;
+}
+
+.main h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px; /* étroit par défaut */
+    }
+
+    .sidebar.expanded {
+        width: 250px; /* s’étend quand on clique sur le logo */
+    }
+
+    .sidebar .menu-item span:not(.material-icons),
+    .sidebar .menu-item-bottom span:not(.material-icons) {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar.expanded .menu-item span:not(.material-icons),
+    .sidebar.expanded .menu-item-bottom span:not(.material-icons) {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+
+.icon-on { color: gold; }
+.icon-off { color: gray; }
+
+.icon-small { font-size: 16px; }
+.icon-medium { font-size: 24px; }
+.icon-large { font-size: 48px; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.wifi-add-form {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px; /* limite largeur sur tablette/desktop */
+    margin: 0 auto;   /* centre sur grand écran */
+}
+
+.wifi-add-form h2 {
+    margin: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.wifi-add-form input {
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wifi-add-form button {
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: none;
+    background-color: #222;
+    color: white;
+    cursor: pointer;
+}
+
+.wifi-add-form button:hover {
+    background-color: #444;
+}
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  flex: 1;
+  padding-right: 35px;
+}
+
+.toggle-mdp {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: #666;
+  user-select: none;
+  font-size: 20px;
+}
+
+.toggle-mdp:hover {
+  color: #000;
+}
+
+/* Mobile portrait */
+@media (max-width: 480px) {
+    .wifi-add-form {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .wifi-add-form input,
+    .wifi-add-form button {
+        font-size: 1em;
+        padding: 8px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.wifi-list-section {
+  margin-top: 25px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wifi-list-section h2 {
+    margin: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.wifi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wifi-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.wifi-card-header {
+  font-weight: bold;
+  color: #222;
+}
+
+.wifi-card-info {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.wifi-card-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.wifi-card-buttons button {
+  flex: 1;
+  margin: 0 3px;
+  padding: 6px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+button.connect { background-color: #222; color: #fff; }
+button.modify { background-color: #222; color: #fff; }
+button.delete { background-color: #222; color: #fff; }
+
+button.connect:hover { background-color: #444; }
+button.modify:hover { background-color: #444; }
+button.delete:hover { background-color: #444; }
+
+/* Harmonise la largeur avec le formulaire d’ajout */
+.wifi-list-section {
+  width: 100%;
+  max-width: 400px; /* même largeur que le formulaire */
+}
+
+/* Ajoute un léger effet au survol pour les cartes */
+.wifi-card:hover {
+  background-color: #f3f3f3;
+  transition: background 0.2s;
+}
+
+.wifi-status-icon {
+  float: right;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.wifi-status-icon.connected { color: rgb(0, 255, 0); }
+.wifi-status-icon.disconnected { color: rgb(235, 235, 235); }
+.wifi-status-icon.error { color: rgb(255, 0, 0); }
+
+/* Améliore la lisibilité sur mobile */
+@media (max-width: 480px) {
+  .wifi-card-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .wifi-card-buttons button {
+    margin: 0;
+    width: 100%;
+  }
+}

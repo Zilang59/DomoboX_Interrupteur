@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>%DISPO_NAME%</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- Sera remplacé automatique par la page style.css de ce même répertoire -->
+</head>
+<body>
+    <!-- Menu lateral -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo" id="logo"><span class="material-icons">apps</span></div>
+
+        <!-- menu du haut -->
+        <div class="menu-top">
+            <div class="menu-item"><a href="/accueil"><span class="material-icons">home</span><span>Accueil</span></a></div>
+            <div class="menu-item"><a href="/wifi"><span class="material-icons">wifi</span><span>Connexion</span></a></div>
+            <div class="menu-item"><a href="/informations"><span class="material-icons">info</span><span>Informations</span></a></div>
+        </div>
+
+        <!-- menu du bas -->
+        <div class="menu-bottom-container">
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/parametres.json"><span class="material-icons">data_object</span><span>Parametres.json</span></a></div>
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/wifi.json"><span class="material-icons">data_object</span><span>Wifi.json</span></a></div>
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/restart"><span class="material-icons">restart_alt</span><span>Redémarrer</span></a></div>
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/reset"><span class="material-icons">credit_card_off</span><span>Remise a zero</span></a></div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Paramètres Wi-Fi</h1>
+
+        <!-- Formulaire pour ajouter un réseau -->
+        <div class="wifi-add-form">
+            <h2>Ajouter un réseau</h2>
+            <input type="text" id="new-ssid" placeholder="SSID">
+            <div class="password-container">
+                <input type="password" id="new-mdp" placeholder="Mot de passe">
+                <span class="toggle-mdp material-icons">visibility_off</span>
+            </div>
+            <button id="add-wifi-btn">Ajouter</button>
+        </div>
+
+        <!-- Table des réseaux enregistrés -->
+        <div class="wifi-list-section">
+            <h2>Réseaux enregistrés</h2>
+            <div id="wifi-list" class="wifi-list">
+                <!-- Les réseaux seront générés ici en JS -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script> <!-- Sera remplacé automatique par la page script.js de ce même répertoire -->
+</body>
+</html>

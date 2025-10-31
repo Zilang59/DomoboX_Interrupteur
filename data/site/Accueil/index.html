@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>%DISPO_NAME%</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- Sera remplacé automatique par la page style.css de ce même répertoire -->
+</head>
+<body>
+    <!-- Menu lateral -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo" id="logo"><span class="material-icons">apps</span></div>
+
+        <!-- menu du haut -->
+        <div class="menu-top">
+            <div class="menu-item"><a href="/accueil"><span class="material-icons">home</span><span>Accueil</span></a></div>
+            <div class="menu-item"><a href="/wifi"><span class="material-icons">wifi</span><span>Connexion</span></a></div>
+            <div class="menu-item"><a href="/informations"><span class="material-icons">info</span><span>Informations</span></a></div>
+        </div>
+
+        <!-- menu du bas -->
+        <div class="menu-bottom-container">
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/parametres.json"><span class="material-icons">data_object</span><span>Parametres.json</span></a></div>
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/wifi.json"><span class="material-icons">data_object</span><span>Wifi.json</span></a></div>
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/restart"><span class="material-icons">restart_alt</span><span>Redémarrer</span></a></div>
+            <div class="menu-item-bottom" style="display:block;%DISPLAY_MENU_ADMIN%"><a href="/reset"><span class="material-icons">credit_card_off</span><span>Remise a zero</span></a></div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Paramètrages</h1>
+
+        <div class="section">
+            <h2>État de la lumière</h2>
+            <div style="position: relative; display: inline-block;">
+                <center><span id="etat_bouton_lampe" class="material-icons %ETATLAMPE% icon-on icon-large bouton">light</span>
+                <span id="wait_light" class="material-icons wait-light">sync</span></center>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Gestion des couleurs</h2>
+            <div class="color-picker-container">
+                <span class="material-icons color-picker-icon color-picker-on icon-large" style="color:rgb(0, 255, 0);color:#%COULEUR_ON%;" id="iconOn">power_settings_new</span>
+                <span class="material-icons color-picker-icon color-picker-on icon-small sub-icon">light_mode</span>
+                <span class="material-icons color-picker-icon color-picker-off icon-large" style="color:rgb(255, 0, 0);color:#%COULEUR_OFF%;" id="iconOff">power_settings_new</span>
+                <span class="material-icons color-picker-icon color-picker-off icon-small sub-icon">brightness_2</span>
+
+                <!-- inputs de couleur invisibles -->
+                <input type="color" id="inputOn" value="#%COULEUR_ON%" class="color-input" style="display:block;">
+                <input type="color" id="inputOff" value="#%COULEUR_OFF%" class="color-input" style="display:block;">
+            </div>
+        </div>
+
+        <div class="section" style="display:block;%DISPLAY_MENU_TACTILE%">
+            <h2>Gestion des boutons</h2>
+            <div class="toggle-container">
+                <div class="toggle">
+                    <span>Physique</span>
+                    <input type="checkbox" id="toggleSwitch" %MODETACTILE% onchange="Changebouton();">
+                    <span>Tactile</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:block;%DISPLAY_LD2410%" class="section">
+            <h2>Détecteur de présence</h2>
+            <div class="line">
+                <span class="label">Allumage sur détection</span>
+                <label class="switch">
+                <input type="checkbox" id="ld2410_on_detect" %LD2410_ON_DETECT% onchange="LD2410_on_detect();">
+                <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="line">
+                <span class="label">Extinction sans détection</span>
+                <label class="switch">
+                <input type="checkbox" id="ld2410_off_nodetect" %LD2410_OFF_NODETECT% onchange="ld2410_off_nodetect();">
+                <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="line">
+                <span class="label">Actif uniquement la nuit</span>
+                <span id="night_hours" class="sublabel off %LD2410_NIGHT_ONLY_ONOFF%">de %SUNSET%<br>à %SUNRISE%</span>
+                <label class="switch">
+                <input type="checkbox" id="ld2410_night_only" %LD2410_NIGHT_ONLY% onchange="ld2410_night_only();">
+                <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="line">
+                <span class="label">Sensibilité</span>
+                <input type="range" id="ld2410_sensitivity" min="0" max="255" value="%LD2410_SENSIBILITE%">
+            </div>
+
+            <button id="ld2410_spoiler_btn" class="spoiler-btn" style="display:block;%DISPLAY_MENU_ADMIN%">Afficher infos avancées</button>
+            <div id="ld2410_spoiler" class="spoiler-block" style="display:none;">
+                <p id="ld2410_info">Chargement...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script> <!-- Sera remplacé automatique par la page script.js de ce même répertoire -->
+</body>
+</html>

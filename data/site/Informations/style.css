@@ -1,0 +1,231 @@
+* {margin: 0; padding: 0; box-sizing: border-box;}
+
+body {
+  display: flex;
+  height: 100vh;
+  font-family: sans-serif;
+  background: #f3f3f3;
+}
+
+/* --- MENU LATÉRAL --- */
+.sidebar {
+  background: #222;
+  color: #fff;
+  width: 250px;
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* prend toute la largeur */
+  height: 100%;
+  overflow: hidden;
+  justify-content: flex-start; /* tout en haut */
+  padding-bottom: 20px; /* pour laisser un peu d'espace pour le bas */
+}
+
+.menu-top {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* prend toute la largeur */
+  margin-top: 0; /* en haut */
+}
+
+.menu-bottom-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto; /* pousse tout vers le bas */
+}
+
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.logo {
+  font-size: 1.8em;
+  margin: 20px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.3s;
+  transform-origin: center;
+  display: flex;
+  justify-content: center;
+  height: 50px; /* fixe pour éviter le déplacement */
+}
+.logo:hover { transform: scale(1.1); }
+
+.menu-item {
+  width: 100%;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-item-bottom {
+  width: 100%;
+  padding: 2px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.menu-item:hover,
+.menu-item-bottom:hover {
+    background: #333;
+}
+
+
+.menu-item a,
+.menu-item-bottom a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.menu-item a:hover,
+.menu-item-bottom a:hover {
+    background: #333;
+}
+
+.menu-item-bottom {
+  margin-top: auto;
+}
+
+.menu-item i, .menu-item-bottom i { font-size: 1.2em; }
+.menu-item span, .menu-item-bottom span { transition: opacity 0.3s; }
+
+/* cache le texte des menus normaux et bas quand menu rétracté */
+.sidebar.collapsed .menu-item span:not(.material-icons),
+.sidebar.collapsed .menu-item-bottom span:not(.material-icons) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- CONTENU PRINCIPAL --- */
+.main {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    transition: margin-left 0.3s;
+}
+
+.main h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px; /* étroit par défaut */
+    }
+
+    .sidebar.expanded {
+        width: 250px; /* s’étend quand on clique sur le logo */
+    }
+
+    .sidebar .menu-item span:not(.material-icons),
+    .sidebar .menu-item-bottom span:not(.material-icons) {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sidebar.expanded .menu-item span:not(.material-icons),
+    .sidebar.expanded .menu-item-bottom span:not(.material-icons) {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.section {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px; /* limite largeur sur tablette/desktop */
+  margin: 0 auto;   /* centre sur grand écran */
+  margin-bottom: 10px;
+  position: relative;
+}
+.section h2 {
+    margin: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+.user-select-none {
+  user-select: none;
+}
+
+.icon-small { font-size: 13px; }
+.icon-medium { font-size: 24px; }
+.icon-large { font-size: 48px; }
+.bouton { cursor:pointer; }
+
+.top-right-section {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+  color: #858585;
+}
+
+.loading-gradient {
+  background: linear-gradient(to top, #4caf50 0%, transparent 0%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: background 0.1s linear;
+}
+
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  font-family: monospace;
+}
+
+.label {
+  flex: 0 0 auto;
+}
+
+.dots {
+  flex: 1;
+  border-bottom: 1px dotted #000;
+  margin: 0 5px;
+}
+
+.value {
+  flex: 0 0 auto;
+}
+
+@keyframes blinkRed {
+  0%, 100% { color: inherit; }
+  50% { color: red; }
+}
+
+.blink-red {
+  animation: blinkRed 0.2s 5;
+}
