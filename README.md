@@ -36,13 +36,6 @@ La documentation complète d'installation, de configuration et d'utilisation ser
 
 Les mises à jour sont publiées régulièrement dans la section [Releases](../../releases) avec les fichiers firmware prêts à installer.
 
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à :
-- 🐛 Signaler des problèmes
-- 💡 Proposer des améliorations  
-- 🔧 Soumettre des pull requests
-
 ## 📄 Licence
 
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
