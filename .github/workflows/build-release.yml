@@ -1,0 +1,96 @@
+name: Build and Release Firmware
+
+on:
+  push:
+    tags:
+      - 'v*'  # Déclenche sur les tags version (ex: v1.0.1)
+  workflow_dispatch:  # Permet de déclencher manuellement
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Cache PlatformIO
+      uses: actions/cache@v4
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+    
+    - name: Extract version from main.cpp
+      id: get_version
+      run: |
+        VERSION=$(grep -o 'String Dispo_version = "[^"]*"' src/main.cpp | sed 's/String Dispo_version = "//g' | sed 's/"//g')
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Detected version: $VERSION"
+    
+    - name: Build PlatformIO Project
+      run: pio run
+    
+    - name: Verify firmware creation
+      run: |
+        VERSION="${{ steps.get_version.outputs.VERSION }}"
+        if [ ! -f "release/firmware_${VERSION}.bin" ]; then
+          echo "❌ Firmware not found in release directory"
+          ls -la release/ || echo "Release directory not found"
+          exit 1
+        else
+          echo "✅ Firmware found: release/firmware_${VERSION}.bin"
+          ls -la release/firmware_${VERSION}.bin
+        fi
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.get_version.outputs.VERSION }}
+        release_name: Release v${{ steps.get_version.outputs.VERSION }}
+        body: |
+          🚀 **Nouvelle version du firmware Domobox Interrupteur**
+          
+          **Version :** ${{ steps.get_version.outputs.VERSION }}
+          
+          ## 📦 Installation
+          1. Télécharger le fichier `firmware_${{ steps.get_version.outputs.VERSION }}.bin`
+          2. Utiliser l'interface web de votre dispositif pour mettre à jour
+          3. Ou utiliser la fonction de mise à jour automatique
+          
+          ## 🔧 Changements
+          - Voir les commits pour les détails des modifications
+          
+          ---
+          *Généré automatiquement par GitHub Actions*
+        draft: false
+        prerelease: false
+    
+    - name: Upload Firmware Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/firmware_${{ steps.get_version.outputs.VERSION }}.bin
+        asset_name: firmware_${{ steps.get_version.outputs.VERSION }}.bin
+        asset_content_type: application/octet-stream

@@ -232,6 +232,7 @@ void startWebServer() {
   server.on("/parameter_info", HTTP_GET, [&](){ parameter_info(&server); });
   server.on("/resetparam", HTTP_GET, resetPARAMETRE);
   server.on("/update_firmware", HTTP_GET, [&](){ update_firmware(&server); });
+  server.on("/check_updates", HTTP_GET, [&](){ check_firmware_updates(&server); });
   server.on("/restart", HTTP_GET, []() {
       server.send(200, "text/html", "<h1>Redémarrage en cours...</h1>");
       DEBUG_PRINTLN("Redémarrage de l'ESP...");
@@ -288,6 +289,7 @@ void setupHotspot() {
   hotspot.on("/parameter_info", HTTP_GET, [&](){ parameter_info(&hotspot); });
   hotspot.on("/reset", HTTP_GET, resetESP);
   hotspot.on("/resetparam", HTTP_GET, resetPARAMETRE);
+  hotspot.on("/check_updates", HTTP_GET, [&](){ check_firmware_updates(&hotspot); });
   hotspot.on("/restart", HTTP_GET, []() {
           hotspot.send(200, "text/html", "<h1>Redémarrage en cours...</h1>");
           DEBUG_PRINTLN("Redémarrage de l'ESP...");
@@ -798,6 +800,92 @@ void parameter_info(WebServer* activeServer) {
   activeServer->send(200, "application/json", data);
 }
 
+// Fonction pour comparer deux versions (format x.y.z)
+bool compareVersions(String newVersion, String currentVersion) {
+    // Conversion simple des versions pour comparaison
+    // Cette fonction peut être améliorée pour gérer tous les cas
+    
+    int newMajor = newVersion.substring(0, newVersion.indexOf('.')).toInt();
+    int newMinor = newVersion.substring(newVersion.indexOf('.') + 1, newVersion.lastIndexOf('.')).toInt();
+    int newPatch = newVersion.substring(newVersion.lastIndexOf('.') + 1).toInt();
+    
+    int currentMajor = currentVersion.substring(0, currentVersion.indexOf('.')).toInt();
+    int currentMinor = currentVersion.substring(currentVersion.indexOf('.') + 1, currentVersion.lastIndexOf('.')).toInt();
+    int currentPatch = currentVersion.substring(currentVersion.lastIndexOf('.') + 1).toInt();
+    
+    if (newMajor > currentMajor) return true;
+    if (newMajor < currentMajor) return false;
+    
+    if (newMinor > currentMinor) return true;
+    if (newMinor < currentMinor) return false;
+    
+    return newPatch > currentPatch;
+}
+
+void check_firmware_updates(WebServer* activeServer) {
+    DEBUG_PRINTLN("Vérification des mises à jour firmware dans le répertoire release/...");
+    
+    HTTPClient http;
+    // API GitHub pour lister le contenu du répertoire release/
+    String apiUrl = "https://api.github.com/repos/Zilang59/DomoboX_Interrupteur/contents/release";
+    http.begin(apiUrl);
+    http.addHeader("User-Agent", "ESP32-Firmware-Updater");
+    
+    int httpCode = http.GET();
+    
+    if (httpCode == 200) {
+        String payload = http.getString();
+        
+        // Rechercher tous les fichiers firmware_*.bin dans la réponse
+        String latestVersion = "";
+        String latestFileName = "";
+        
+        int pos = 0;
+        while ((pos = payload.indexOf("\"name\":\"firmware_", pos)) != -1) {
+            pos += 18; // Longueur de "\"name\":\"firmware_"
+            int endPos = payload.indexOf(".bin\"", pos);
+            if (endPos != -1) {
+                String version = payload.substring(pos, endPos);
+                
+                DEBUG_PRINT("Version trouvée : ");
+                DEBUG_PRINTLN(version);
+                
+                // Comparer avec la version courante pour trouver la plus récente
+                if (latestVersion == "" || compareVersions(version, latestVersion)) {
+                    latestVersion = version;
+                    latestFileName = "firmware_" + version + ".bin";
+                }
+            }
+            pos = endPos;
+        }
+        
+        if (latestVersion != "") {
+            DEBUG_PRINT("Version la plus récente trouvée : ");
+            DEBUG_PRINTLN(latestVersion);
+            DEBUG_PRINT("Version actuelle : ");
+            DEBUG_PRINTLN(param.Version);
+            
+            // Comparer les versions
+            bool updateAvailable = compareVersions(latestVersion, param.Version);
+            
+            String response = "{\"status\":\"success\",\"current_version\":\"" + param.Version + 
+                            "\",\"latest_version\":\"" + latestVersion + 
+                            "\",\"update_available\":" + (updateAvailable ? "true" : "false") + 
+                            ",\"download_url\":\"" + latestFileName + "\"}";
+            
+            activeServer->send(200, "application/json", response);
+        } else {
+            activeServer->send(500, "application/json", "{\"status\":\"error\",\"message\":\"Aucun firmware trouvé dans le répertoire release/\"}");
+        }
+    } else {
+        DEBUG_PRINT("Erreur API GitHub : ");
+        DEBUG_PRINTLN(httpCode);
+        activeServer->send(500, "application/json", "{\"status\":\"error\",\"message\":\"Erreur API GitHub\"}");
+    }
+    
+    http.end();
+}
+
 void update_firmware(WebServer* activeServer) {
     String fileName = activeServer->arg("file");
     if (fileName == "") {
@@ -805,14 +893,20 @@ void update_firmware(WebServer* activeServer) {
         return;
     }
 
-    String url = "http://novalys.ovh/UpdateArduino/" + fileName;
-    DEBUG_PRINT("Téléchargement depuis : ");
+    // URL GitHub pour télécharger depuis le répertoire release/
+    // Format : https://raw.githubusercontent.com/OWNER/REPO/main/release/FILENAME
+    String url = "https://raw.githubusercontent.com/Zilang59/DomoboX_Interrupteur/main/release/" + fileName;
+    DEBUG_PRINT("Téléchargement depuis GitHub : ");
     DEBUG_PRINTLN(url);
     activeServer->send(200, "application/json", "{\"status\":\"success\"}");
     delay(100);
 
     HTTPClient http;
     http.begin(url);
+    
+    // Suivre les redirections GitHub
+    http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+    
     int httpCode = http.GET();
 
     if (httpCode == 200) {
@@ -839,6 +933,9 @@ void update_firmware(WebServer* activeServer) {
     } else {
         DEBUG_PRINT("Erreur HTTP : ");
         DEBUG_PRINTLN(httpCode);
+        if (httpCode == 404) {
+            DEBUG_PRINTLN("Firmware non trouvé sur GitHub");
+        }
     }
 
     http.end();

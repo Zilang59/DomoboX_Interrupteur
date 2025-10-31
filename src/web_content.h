@@ -1653,6 +1653,9 @@ body {
     <script>
 window.onload = function () {
   checkNewFirmware();
+  
+  // Vérifier les mises à jour toutes les 5 minutes
+  setInterval(checkNewFirmware, 5 * 60 * 1000);
 };
 
 const sidebar = document.getElementById('sidebar');
@@ -1736,59 +1739,72 @@ window.addEventListener('load', initSidebar);
 function checkNewFirmware() {
   const boutonUpdate = document.getElementById("bouton_update");
   const currentVersion = document.getElementById("version_num").textContent.trim();
-  const deviceName = "%DISPO_BASENAME%";
 
-  fetch("http://novalys.ovh/UpdateArduino/index.php")
-      .then(resp => resp.json())
-      .then(files => {
-        const binFiles = files
-          .map(f => f.name)
-          .filter(name => name.startsWith(deviceName + "_") && name.endsWith(".bin"));
-
-        const newer = binFiles.find(name => {
-          const version = name.match(/_(\d+\.\d+\.\d+)\.bin$/);
-          return version && isNewerVersion(version[1], currentVersion);
-        });
-
-        if (newer) {
-          boutonUpdate.dataset.file = newer;
+  // Utilise le nouveau endpoint local qui vérifie GitHub
+  fetch("/check_updates")
+      .then(resp => {
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        }
+        return resp.json();
+      })
+      .then(data => {
+        console.log("Vérification des mises à jour:", data);
+        
+        if (data.status === "success" && data.update_available) {
+          // Une mise à jour est disponible
+          boutonUpdate.dataset.file = data.download_url;
+          boutonUpdate.dataset.version = data.latest_version;
           boutonUpdate.style.display = "inline-block";
+          
+          // Met à jour le texte du bouton avec la nouvelle version
+          const icon = boutonUpdate.querySelector('.material-icons');
+          if (icon) {
+            boutonUpdate.title = `Mise à jour vers v${data.latest_version} disponible (actuelle: v${data.current_version})`;
+          }
+          
+          console.log(`✅ Nouvelle version disponible: ${data.latest_version} (actuelle: ${data.current_version})`);
+        } else if (data.status === "success") {
+          // Pas de mise à jour disponible
+          boutonUpdate.style.display = "none";
+          console.log(`✅ Firmware à jour (version ${data.current_version})`);
         } else {
+          // Erreur dans la réponse
+          console.log("❌ Erreur:", data.message || "Réponse inattendue");
           boutonUpdate.style.display = "none";
         }
       })
-      .catch(() => boutonUpdate.style.display = "none");
-  }
-
-  function isNewerVersion(v1, v2) {
-    const a = v1.split('.').map(Number);
-    const b = v2.split('.').map(Number);
-    for (let i = 0; i < 3; i++) {
-      if (a[i] > b[i]) return true;
-      if (a[i] < b[i]) return false;
-    }
-    return false;
-  }
-
+      .catch(error => {
+        console.log("❌ Erreur lors de la vérification des mises à jour:", error.message);
+        boutonUpdate.style.display = "none";
+        
+        // En cas d'erreur réseau, on peut essayer de fallback sur une vérification locale
+        if (error.message.includes('Failed to fetch')) {
+          console.log("💡 Vérification réseau échouée - mode hors ligne");
+        }
+      });
+}
 
 
   boutonUpdate.addEventListener("click", () => {
-    if(!confirm("Confirmer la mise à jour du firmware ?")) return;
-
     const fileName = boutonUpdate.dataset.file; // le .bin détecté
+    const version = boutonUpdate.dataset.version; // la version détectée
+    
+    if(!confirm(`Confirmer la mise à jour vers la version ${version} ?`)) return;
+
     boutonUpdate.style.pointerEvents = "none"; // bloque le bouton
     animateIcon(boutonUpdate);
 
     fetch(`/update_firmware?file=${encodeURIComponent(fileName)}`)
       .then(response => response.json())
       .then(data => {
-        console.log("Mise à jour du firmware lancée");
+        console.log("Mise à jour du firmware lancée depuis GitHub");
         // après envoi OTA, on commence à checker si le serveur répond
         setTimeout(() => checkServerAndRefresh(window.location.origin, boutonUpdate), 30000); 
         // 30s de délai pour laisser l'OTA démarrer
       })
       .catch(error => {
-        console.log("Erreur lors de la mise à jour du firmware");
+        console.log("Erreur lors de la mise à jour du firmware:", error);
         boutonUpdate.style.pointerEvents = "auto";
         resetIcon(boutonUpdate);
       });

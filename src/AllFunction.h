@@ -48,9 +48,11 @@
 
 // setupWIFI.h
     String getUniqueESP32ID();
+    bool compareVersions(String newVersion, String currentVersion);
     bool connectToWiFi();
     bool loop_Wifi();
     void accueil(WebServer* activeServer);
+    void check_firmware_updates(WebServer* activeServer);
     void gestion_wifi(WebServer* activeServer);
     void informations(WebServer* activeServer);
     void ld2410_info(WebServer* activeServer);
