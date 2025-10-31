@@ -840,6 +840,16 @@ void check_firmware_updates(WebServer* activeServer) {
     
     http.begin(apiUrl);
     http.addHeader("User-Agent", "ESP32-Firmware-Updater");
+    
+    // Ajouter le token GitHub si défini (pour dépôt privé)
+    if (GITHUB_TOKEN != "" && GITHUB_TOKEN.length() > 0) {
+        String authHeader = "Bearer " + GITHUB_TOKEN;
+        http.addHeader("Authorization", authHeader);
+        DEBUG_PRINTLN("Token GitHub ajouté pour authentification");
+    } else {
+        DEBUG_PRINTLN("Aucun token GitHub - accès dépôt public uniquement");
+    }
+    
     http.setTimeout(10000); // Augmentons le timeout à 10 secondes
     
     DEBUG_PRINTLN("Envoi de la requête GET...");
@@ -926,6 +936,13 @@ void update_firmware(WebServer* activeServer) {
     HTTPClient http;
     http.begin(url);
     http.setTimeout(10000); // Timeout de 10 secondes pour le téléchargement
+    
+    // Ajouter le token GitHub si défini (pour dépôt privé)
+    if (GITHUB_TOKEN != "" && GITHUB_TOKEN.length() > 0) {
+        String authHeader = "Bearer " + GITHUB_TOKEN;
+        http.addHeader("Authorization", authHeader);
+        DEBUG_PRINTLN("Token GitHub ajouté pour téléchargement");
+    }
     
     // Suivre les redirections GitHub
     http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
