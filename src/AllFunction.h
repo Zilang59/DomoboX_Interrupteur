@@ -72,6 +72,7 @@
 // DONOTTOUCH/Cryptage.h
     String decryptPassword(const String& encryptedPassword);
     String encryptPassword(const String& password);
+    String getDeviceKey();
 
 // DONOTTOUCH/OTA_Update.h
     void handleOTA();
