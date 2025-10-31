@@ -5,8 +5,7 @@
 .vscode/launch.json
 .vscode/ipch
 
-# Fichiers binaires générés (mais on garde le répertoire release)
-release/*.bin
+# Fichiers binaires générés (sauf les firmwares release)
 release/*.elf
 release/*.map
 
