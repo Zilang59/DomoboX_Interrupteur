@@ -803,7 +803,10 @@ void parameter_info(WebServer* activeServer) {
 // Fonction pour comparer deux versions (format x.y.z)
 bool compareVersions(String newVersion, String currentVersion) {
     // Conversion simple des versions pour comparaison
-    // Cette fonction peut être améliorée pour gérer tous les cas
+    DEBUG_PRINT("Comparaison versions : ");
+    DEBUG_PRINT(newVersion);
+    DEBUG_PRINT(" vs ");
+    DEBUG_PRINTLN(currentVersion);
     
     int newMajor = newVersion.substring(0, newVersion.indexOf('.')).toInt();
     int newMinor = newVersion.substring(newVersion.indexOf('.') + 1, newVersion.lastIndexOf('.')).toInt();
@@ -812,6 +815,20 @@ bool compareVersions(String newVersion, String currentVersion) {
     int currentMajor = currentVersion.substring(0, currentVersion.indexOf('.')).toInt();
     int currentMinor = currentVersion.substring(currentVersion.indexOf('.') + 1, currentVersion.lastIndexOf('.')).toInt();
     int currentPatch = currentVersion.substring(currentVersion.lastIndexOf('.') + 1).toInt();
+    
+    DEBUG_PRINT("Nouvelle version parsée : ");
+    DEBUG_PRINT(newMajor);
+    DEBUG_PRINT(".");
+    DEBUG_PRINT(newMinor);
+    DEBUG_PRINT(".");
+    DEBUG_PRINTLN(newPatch);
+    
+    DEBUG_PRINT("Version actuelle parsée : ");
+    DEBUG_PRINT(currentMajor);
+    DEBUG_PRINT(".");
+    DEBUG_PRINT(currentMinor);
+    DEBUG_PRINT(".");
+    DEBUG_PRINTLN(currentPatch);
     
     if (newMajor > currentMajor) return true;
     if (newMajor < currentMajor) return false;
@@ -856,18 +873,22 @@ void check_firmware_updates(WebServer* activeServer) {
         
         int pos = 0;
         while ((pos = payload.indexOf("\"name\":\"firmware_", pos)) != -1) {
-            pos += 18; // Longueur de "\"name\":\"firmware_"
-            int endPos = payload.indexOf(".bin\"", pos);
-            if (endPos != -1) {
-                String version = payload.substring(pos, endPos);
+            // Trouver le début de la version (après "firmware_")
+            int versionStart = payload.indexOf("firmware_", pos) + 9; // 9 = longueur de "firmware_"
+            int endPos = payload.indexOf(".bin\"", versionStart);
+            if (endPos != -1 && versionStart < endPos) {
+                String version = payload.substring(versionStart, endPos);
                 
                 DEBUG_PRINT("Version trouvée : ");
                 DEBUG_PRINTLN(version);
                 
-                // Comparer avec la version courante pour trouver la plus récente
-                if (latestVersion == "" || compareVersions(version, latestVersion)) {
-                    latestVersion = version;
-                    latestFileName = "firmware_" + version + ".bin";
+                // Vérifier que la version n'est pas vide et contient au moins un point
+                if (version.length() > 0 && version.indexOf('.') != -1) {
+                    // Comparer avec la version courante pour trouver la plus récente
+                    if (latestVersion == "" || compareVersions(version, latestVersion)) {
+                        latestVersion = version;
+                        latestFileName = "firmware_" + version + ".bin";
+                    }
                 }
             }
             pos = endPos;
