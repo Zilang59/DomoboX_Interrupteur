@@ -9,7 +9,7 @@
     X(bool, Admin_site, false) \
     X(bool, BOUTON_UP_Connected, false) \
     X(bool, BOUTON_DOWN_Connected, true) \
-    X(bool, BOUTON_TACTILE_Connected, false) \
+    X(bool, BOUTON_TACTILE_Connected, true) \
     X(bool, TWO_RELAIS_Connected, false) \
     X(bool, LD2410S_Connected, false) \
     X(bool, LD2410S_Activate_on, false) \
