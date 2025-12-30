@@ -248,6 +248,32 @@ input.color-input {
   pointer-events: none;
 }
 
+.color-picker {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-picker canvas {
+  border: 1px solid #ccc;
+  cursor: crosshair;
+}
+
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.color-swatch {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
 
 
 
@@ -383,6 +409,60 @@ input:checked + .slider:before {
   font-size: 0.9em;
   color: #333;
 }
+
+.color-picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.color-picker-content {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  position: relative;
+}
+
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.color-swatch {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.color-picker {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.color-picker canvas {
+  border: 1px solid #ccc;
+  cursor: crosshair;
+}
+
+.modal-open {
+  overflow: hidden;
+}
 </style> <!-- Sera remplacé automatique par la page style.css de ce même répertoire -->
 </head>
 <body>
@@ -425,10 +505,59 @@ input:checked + .slider:before {
                 <span class="material-icons color-picker-icon color-picker-off icon-large" style="color:rgb(255, 0, 0);color:#%COULEUR_OFF%;" id="iconOff">power_settings_new</span>
                 <span class="material-icons color-picker-icon color-picker-off icon-small sub-icon">brightness_2</span>
 
-                <!-- inputs de couleur invisibles -->
-                <input type="color" id="inputOn" value="#%COULEUR_ON%" class="color-input" style="display:block;">
-                <input type="color" id="inputOff" value="#%COULEUR_OFF%" class="color-input" style="display:block;">
+                <!-- Color pickers -->
+                <div id="colorPickerOn" class="color-picker-modal" style="display:none;">
+                    <div class="color-picker-content">
+                        <div class="color-palette">
+                            <div class="color-swatch" data-color="#FF0000"></div>
+                            <div class="color-swatch" data-color="#00FF00"></div>
+                            <div class="color-swatch" data-color="#0000FF"></div>
+                            <div class="color-swatch" data-color="#FFFF00"></div>
+                            <div class="color-swatch" data-color="#FF00FF"></div>
+                            <div class="color-swatch" data-color="#00FFFF"></div>
+                            <div class="color-swatch" data-color="#FFA500"></div>
+                            <div class="color-swatch" data-color="#800080"></div>
+                            <div class="color-swatch" data-color="#FFC0CB"></div>
+                            <div class="color-swatch" data-color="#A52A2A"></div>
+                            <div class="color-swatch" data-color="#808080"></div>
+                            <div class="color-swatch" data-color="#000000"></div>
+                            <div class="color-swatch" data-color="#FFFFFF"></div>
+                        </div>
+                        <div class="color-picker">
+                            <canvas id="colorCanvasOn" width="200" height="200"></canvas>
+                            <canvas id="hueCanvasOn" width="20" height="200"></canvas>
+                        </div>
+                        <button id="okOn">OK</button>
+                        <button id="cancelOn">Annuler</button>
+                    </div>
+                </div>
+                <div id="colorPickerOff" class="color-picker-modal" style="display:none;">
+                    <div class="color-picker-content">
+                        <div class="color-palette">
+                            <div class="color-swatch" data-color="#FF0000"></div>
+                            <div class="color-swatch" data-color="#00FF00"></div>
+                            <div class="color-swatch" data-color="#0000FF"></div>
+                            <div class="color-swatch" data-color="#FFFF00"></div>
+                            <div class="color-swatch" data-color="#FF00FF"></div>
+                            <div class="color-swatch" data-color="#00FFFF"></div>
+                            <div class="color-swatch" data-color="#FFA500"></div>
+                            <div class="color-swatch" data-color="#800080"></div>
+                            <div class="color-swatch" data-color="#FFC0CB"></div>
+                            <div class="color-swatch" data-color="#A52A2A"></div>
+                            <div class="color-swatch" data-color="#808080"></div>
+                            <div class="color-swatch" data-color="#000000"></div>
+                            <div class="color-swatch" data-color="#FFFFFF"></div>
+                        </div>
+                        <div class="color-picker">
+                            <canvas id="colorCanvasOff" width="200" height="200"></canvas>
+                            <canvas id="hueCanvasOff" width="20" height="200"></canvas>
+                        </div>
+                        <button id="okOff">OK</button>
+                        <button id="cancelOff">Annuler</button>
+                    </div>
+                </div>
             </div>
+            <div id="status"></div>
         </div>
 
         <div class="section" style="display:block;%DISPLAY_MENU_TACTILE%">
@@ -484,12 +613,24 @@ input:checked + .slider:before {
     <script>
 window.onload = function() {
   RefreshInfo();
+  setInitialSliders();
+  drawHueCanvas(document.getElementById('hueCanvasOn'));
+  drawHueIndicator(document.getElementById('hueCanvasOn'), hOn);
+  drawHueCanvas(document.getElementById('hueCanvasOff'));
+  drawHueIndicator(document.getElementById('hueCanvasOff'), hOff);
+  drawColorCanvas(document.getElementById('colorCanvasOn'), hOn);
+  drawColorIndicator(document.getElementById('colorCanvasOn'), sOn, vOn);
+  drawColorCanvas(document.getElementById('colorCanvasOff'), hOff);
+  drawColorIndicator(document.getElementById('colorCanvasOff'), sOff, vOff);
 };
 
 
 
 const sidebar = document.getElementById('sidebar');
 const logo = document.getElementById('logo');
+
+let ld2410Interval;
+let parameterInterval;
 
 function initSidebar() {
   if (window.innerWidth <= 768) {
@@ -529,7 +670,7 @@ function RefreshInfo() {
   fetchData();
 
   // Puis toutes les 5 secondes
-  ld2410Interval = setInterval(fetchData, 5000);
+  parameterInterval = setInterval(fetchData, 5000);
 }
 
 
@@ -597,43 +738,378 @@ etat_bouton_lampe.addEventListener('click', () => {
 
 const iconOn = document.getElementById('iconOn');
 const iconOff = document.getElementById('iconOff');
-const inputOn = document.getElementById('inputOn');
-const inputOff = document.getElementById('inputOff');
 
-// Quand on clique sur l'icône, ouvre l'input couleur
-iconOn.addEventListener('click', () => inputOn.click());
-iconOff.addEventListener('click', () => inputOff.click());
+// HSV values
+let hOn = 120, sOn = 100, vOn = 100; // Default green
+let hOff = 0, sOff = 100, vOff = 100; // Default red
 
-// Quand on choisit une couleur, met à jour l'icône
-inputOn.addEventListener('input', () => {
-  iconOn.style.color = inputOn.value;
+// Initial values for cancel
+let initialHOn, initialSOn, initialVOn;
+let initialHOff, initialSOff, initialVOff;
+
+function hsvToRgb(h, s, v) {
+  h = h / 360;
+  s = s / 100;
+  v = v / 100;
+  let r, g, b;
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0: r = v, g = t, b = p; break;
+    case 1: r = q, g = v, b = p; break;
+    case 2: r = p, g = v, b = t; break;
+    case 3: r = p, g = q, b = v; break;
+    case 4: r = t, g = p, b = v; break;
+    case 5: r = v, g = p, b = q; break;
+  }
+  return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+}
+
+function hexToHsv(hex) {
+  const r = parseInt(hex.substr(1,2),16)/255;
+  const g = parseInt(hex.substr(3,2),16)/255;
+  const b = parseInt(hex.substr(5,2),16)/255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const v = max;
+  const d = max - min;
+  const s = max === 0 ? 0 : d / max;
+  let h;
+  if (max === min) {
+    h = 0;
+  } else {
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return { h: h * 360, s: s * 100, v: v * 100 };
+}
+
+function drawHueCanvas(canvas) {
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, 'red');
+  gradient.addColorStop(1/6, 'yellow');
+  gradient.addColorStop(2/6, 'lime');
+  gradient.addColorStop(3/6, 'cyan');
+  gradient.addColorStop(4/6, 'blue');
+  gradient.addColorStop(5/6, 'magenta');
+  gradient.addColorStop(1, 'red');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawColorCanvas(canvas, h) {
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.createImageData(canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let y = 0; y < canvas.height; y++) {
+    for (let x = 0; x < canvas.width; x++) {
+      const s = (x / canvas.width) * 100;
+      const v = (1 - y / canvas.height) * 100;
+      const rgb = hsvToRgb(h, s, v);
+      const index = (y * canvas.width + x) * 4;
+      data[index] = rgb.r;
+      data[index + 1] = rgb.g;
+      data[index + 2] = rgb.b;
+      data[index + 3] = 255;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function drawHueIndicator(canvas, h) {
+  const ctx = canvas.getContext('2d');
+  const y = (h / 360) * canvas.height;
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, y);
+  ctx.lineTo(canvas.width, y);
+  ctx.stroke();
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function drawColorIndicator(canvas, s, v) {
+  const ctx = canvas.getContext('2d');
+  const x = (s / 100) * canvas.width;
+  const y = (1 - v / 100) * canvas.height;
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, 2 * Math.PI);
+  ctx.stroke();
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function updateColor(suffix) {
+  const h = suffix === 'On' ? hOn : hOff;
+  const s = suffix === 'On' ? sOn : sOff;
+  const v = suffix === 'On' ? vOn : vOff;
+  const rgb = hsvToRgb(h, s, v);
+  const color = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+  const icon = suffix === 'On' ? iconOn : iconOff;
+  icon.style.color = color;
+}
+
+function setInitialSliders() {
+  const colorOn = iconOn.style.color;
+  const rgbOn = colorOn.match(/\d+/g);
+  if (rgbOn) {
+    const r = parseInt(rgbOn[0]);
+    const g = parseInt(rgbOn[1]);
+    const b = parseInt(rgbOn[2]);
+    const hsv = rgbToHsv(r, g, b);
+    hOn = hsv.h;
+    sOn = hsv.s;
+    vOn = hsv.v;
+  }
+  const colorOff = iconOff.style.color;
+  const rgbOff = colorOff.match(/\d+/g);
+  if (rgbOff) {
+    const r = parseInt(rgbOff[0]);
+    const g = parseInt(rgbOff[1]);
+    const b = parseInt(rgbOff[2]);
+    const hsv = rgbToHsv(r, g, b);
+    hOff = hsv.h;
+    sOff = hsv.s;
+    vOff = hsv.v;
+  }
+}
+
+function rgbToHsv(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const v = max;
+  const d = max - min;
+  const s = max === 0 ? 0 : d / max;
+  let h;
+  if (max === min) {
+    h = 0;
+  } else {
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return { h: h * 360, s: s * 100, v: v * 100 };
+}
+function setColorFromHex(suffix, hex) {
+  const hsv = hexToHsv(hex);
+  if (suffix === 'On') {
+    hOn = hsv.h;
+    sOn = hsv.s;
+    vOn = hsv.v;
+    drawColorCanvas(document.getElementById('colorCanvasOn'), hOn);
+    drawColorIndicator(document.getElementById('colorCanvasOn'), sOn, vOn);
+    drawHueCanvas(document.getElementById('hueCanvasOn'));
+    drawHueIndicator(document.getElementById('hueCanvasOn'), hOn);
+  } else {
+    hOff = hsv.h;
+    sOff = hsv.s;
+    vOff = hsv.v;
+    drawColorCanvas(document.getElementById('colorCanvasOff'), hOff);
+    drawColorIndicator(document.getElementById('colorCanvasOff'), sOff, vOff);
+    drawHueCanvas(document.getElementById('hueCanvasOff'));
+    drawHueIndicator(document.getElementById('hueCanvasOff'), hOff);
+  }
+  updateColor(suffix);
+}
+
+// Event listeners for color swatches
+document.querySelectorAll('#colorPickerOn .color-swatch').forEach(swatch => {
+  swatch.style.backgroundColor = swatch.dataset.color;
+  swatch.addEventListener('click', () => {
+    const color = swatch.dataset.color;
+    setColorFromHex('On', color);
+  });
 });
-inputOn.addEventListener('change', () => {
+
+document.querySelectorAll('#colorPickerOff .color-swatch').forEach(swatch => {
+  swatch.style.backgroundColor = swatch.dataset.color;
+  swatch.addEventListener('click', () => {
+    const color = swatch.dataset.color;
+    setColorFromHex('Off', color);
+  });
+});
+
+// Event listeners for canvases
+let draggingHue = false, draggingColor = false, currentSuffix = '';
+
+function updateFromMouse(e, canvas, suffix) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.max(0, Math.min(canvas.width, e.clientX - rect.left));
+  const y = Math.max(0, Math.min(canvas.height, e.clientY - rect.top));
+  if (canvas.id.includes('hue')) {
+    const h = (y / canvas.height) * 360;
+    if (suffix === 'On') {
+      hOn = h;
+      drawColorCanvas(document.getElementById('colorCanvasOn'), hOn);
+      drawHueCanvas(canvas);
+      drawHueIndicator(canvas, hOn);
+    } else {
+      hOff = h;
+      drawColorCanvas(document.getElementById('colorCanvasOff'), hOff);
+      drawHueCanvas(canvas);
+      drawHueIndicator(canvas, hOff);
+    }
+  } else {
+    const s = (x / canvas.width) * 100;
+    const v = (1 - y / canvas.height) * 100;
+    if (suffix === 'On') {
+      sOn = s;
+      vOn = v;
+      drawColorCanvas(canvas, hOn);
+      drawColorIndicator(canvas, sOn, vOn);
+    } else {
+      sOff = s;
+      vOff = v;
+      drawColorCanvas(canvas, hOff);
+      drawColorIndicator(canvas, sOff, vOff);
+    }
+  }
+  updateColor(suffix);
+}
+
+document.getElementById('hueCanvasOn').addEventListener('mousedown', (e) => { draggingHue = true; currentSuffix = 'On'; updateFromMouse(e, e.target, 'On'); });
+document.getElementById('colorCanvasOn').addEventListener('mousedown', (e) => { draggingColor = true; currentSuffix = 'On'; updateFromMouse(e, e.target, 'On'); });
+document.getElementById('hueCanvasOff').addEventListener('mousedown', (e) => { draggingHue = true; currentSuffix = 'Off'; updateFromMouse(e, e.target, 'Off'); });
+document.getElementById('colorCanvasOff').addEventListener('mousedown', (e) => { draggingColor = true; currentSuffix = 'Off'; updateFromMouse(e, e.target, 'Off'); });
+
+document.addEventListener('mousemove', (e) => {
+  if (draggingHue) {
+    const canvas = document.getElementById('hueCanvas' + currentSuffix);
+    updateFromMouse(e, canvas, currentSuffix);
+  } else if (draggingColor) {
+    const canvas = document.getElementById('colorCanvas' + currentSuffix);
+    updateFromMouse(e, canvas, currentSuffix);
+  }
+});
+
+document.addEventListener('mouseup', () => { draggingHue = false; draggingColor = false; });
+
+// Quand on clique sur l'icône, ouvre le picker
+iconOn.addEventListener('click', () => {
+  // Save initial values
+  initialHOn = hOn;
+  initialSOn = sOn;
+  initialVOn = vOn;
+  // Show modal
+  document.getElementById('colorPickerOn').style.display = 'flex';
+  document.body.classList.add('modal-open');
+});
+
+iconOff.addEventListener('click', () => {
+  // Save initial values
+  initialHOff = hOff;
+  initialSOff = sOff;
+  initialVOff = vOff;
+  // Show modal
+  document.getElementById('colorPickerOff').style.display = 'flex';
+  document.body.classList.add('modal-open');
+});
+
+// OK buttons
+document.getElementById('okOn').addEventListener('click', () => {
+  document.getElementById('colorPickerOn').style.display = 'none';
+  document.body.classList.remove('modal-open');
   submitColors();
 });
 
-inputOff.addEventListener('input', () => {
-  iconOff.style.color = inputOff.value;
-});
-inputOff.addEventListener('change', () => {
+document.getElementById('okOff').addEventListener('click', () => {
+  document.getElementById('colorPickerOff').style.display = 'none';
+  document.body.classList.remove('modal-open');
   submitColors();
+});
+
+// Cancel buttons
+document.getElementById('cancelOn').addEventListener('click', () => {
+  hOn = initialHOn;
+  sOn = initialSOn;
+  vOn = initialVOn;
+  updateColor('On');
+  document.getElementById('colorPickerOn').style.display = 'none';
+  document.body.classList.remove('modal-open');
+});
+
+document.getElementById('cancelOff').addEventListener('click', () => {
+  hOff = initialHOff;
+  sOff = initialSOff;
+  vOff = initialVOff;
+  updateColor('Off');
+  document.getElementById('colorPickerOff').style.display = 'none';
+  document.body.classList.remove('modal-open');
+});
+
+// Close modal on click outside
+document.getElementById('colorPickerOn').addEventListener('click', (e) => {
+  if (e.target.id === 'colorPickerOn') {
+    document.getElementById('colorPickerOn').style.display = 'none';
+    document.body.classList.remove('modal-open');
+    hOn = initialHOn;
+    sOn = initialSOn;
+    vOn = initialVOn;
+    updateColor('On');
+  }
+});
+
+document.getElementById('colorPickerOff').addEventListener('click', (e) => {
+  if (e.target.id === 'colorPickerOff') {
+    document.getElementById('colorPickerOff').style.display = 'none';
+    document.body.classList.remove('modal-open');
+    hOff = initialHOff;
+    sOff = initialSOff;
+    vOff = initialVOff;
+    updateColor('Off');
+  }
 });
 
 function submitColors() {
-  const colorOn = document.getElementById("inputOn").value.slice(1);
-  const colorOff = document.getElementById("inputOff").value.slice(1);
+  // Convert rgb to hex
+  function rgbToHex(rgb) {
+    const result = rgb.match(/\d+/g);
+    return ((1 << 24) + (parseInt(result[0]) << 16) + (parseInt(result[1]) << 8) + parseInt(result[2])).toString(16).slice(1);
+  }
+  const colorOn = rgbToHex(iconOn.style.color);
+  const colorOff = rgbToHex(iconOff.style.color);
   fetch("/option?parametre=1&colorOn=" + colorOn + "&colorOff=" + colorOff)
       .then(response => response.json())
       .then(data => {
-          document.getElementById("status").innerHTML = "<span class='success'>Couleurs mises à jour avec succès!</span>";
+          // Add a status div if not exists
+          let status = document.getElementById("status");
+          if (!status) {
+            status = document.createElement("div");
+            status.id = "status";
+            document.querySelector('.color-picker-container').appendChild(status);
+          }
+          status.innerHTML = "<span class='success'>Couleurs mises à jour avec succès!</span>";
           setTimeout(() => {
-              document.getElementById("status").innerHTML = "";
+              status.innerHTML = "";
           }, 3000);
       })
       .catch(error => {
-          document.getElementById("status").innerHTML = "<span class='error'>Erreur de mise à jour.</span>";
+          let status = document.getElementById("status");
+          if (!status) {
+            status = document.createElement("div");
+            status.id = "status";
+            document.querySelector('.color-picker-container').appendChild(status);
+          }
+          status.innerHTML = "<span class='error'>Erreur de mise à jour.</span>";
           setTimeout(() => {
-              document.getElementById("status").innerHTML = "";
+              status.innerHTML = "";
           }, 3000);
       });
 }
@@ -745,7 +1221,6 @@ sens.addEventListener("input", () => {
   }, 500);
 });
 
-let ld2410Interval;
 document.getElementById("ld2410_spoiler_btn").addEventListener("click", () => {
   const spoiler = document.getElementById("ld2410_spoiler");
 

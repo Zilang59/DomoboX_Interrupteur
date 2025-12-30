@@ -49,10 +49,59 @@
                 <span class="material-icons color-picker-icon color-picker-off icon-large" style="color:rgb(255, 0, 0);color:#%COULEUR_OFF%;" id="iconOff">power_settings_new</span>
                 <span class="material-icons color-picker-icon color-picker-off icon-small sub-icon">brightness_2</span>
 
-                <!-- inputs de couleur invisibles -->
-                <input type="color" id="inputOn" value="#%COULEUR_ON%" class="color-input" style="display:block;">
-                <input type="color" id="inputOff" value="#%COULEUR_OFF%" class="color-input" style="display:block;">
+                <!-- Color pickers -->
+                <div id="colorPickerOn" class="color-picker-modal" style="display:none;">
+                    <div class="color-picker-content">
+                        <div class="color-palette">
+                            <div class="color-swatch" data-color="#FF0000"></div>
+                            <div class="color-swatch" data-color="#00FF00"></div>
+                            <div class="color-swatch" data-color="#0000FF"></div>
+                            <div class="color-swatch" data-color="#FFFF00"></div>
+                            <div class="color-swatch" data-color="#FF00FF"></div>
+                            <div class="color-swatch" data-color="#00FFFF"></div>
+                            <div class="color-swatch" data-color="#FFA500"></div>
+                            <div class="color-swatch" data-color="#800080"></div>
+                            <div class="color-swatch" data-color="#FFC0CB"></div>
+                            <div class="color-swatch" data-color="#A52A2A"></div>
+                            <div class="color-swatch" data-color="#808080"></div>
+                            <div class="color-swatch" data-color="#000000"></div>
+                            <div class="color-swatch" data-color="#FFFFFF"></div>
+                        </div>
+                        <div class="color-picker">
+                            <canvas id="colorCanvasOn" width="200" height="200"></canvas>
+                            <canvas id="hueCanvasOn" width="20" height="200"></canvas>
+                        </div>
+                        <button id="okOn">OK</button>
+                        <button id="cancelOn">Annuler</button>
+                    </div>
+                </div>
+                <div id="colorPickerOff" class="color-picker-modal" style="display:none;">
+                    <div class="color-picker-content">
+                        <div class="color-palette">
+                            <div class="color-swatch" data-color="#FF0000"></div>
+                            <div class="color-swatch" data-color="#00FF00"></div>
+                            <div class="color-swatch" data-color="#0000FF"></div>
+                            <div class="color-swatch" data-color="#FFFF00"></div>
+                            <div class="color-swatch" data-color="#FF00FF"></div>
+                            <div class="color-swatch" data-color="#00FFFF"></div>
+                            <div class="color-swatch" data-color="#FFA500"></div>
+                            <div class="color-swatch" data-color="#800080"></div>
+                            <div class="color-swatch" data-color="#FFC0CB"></div>
+                            <div class="color-swatch" data-color="#A52A2A"></div>
+                            <div class="color-swatch" data-color="#808080"></div>
+                            <div class="color-swatch" data-color="#000000"></div>
+                            <div class="color-swatch" data-color="#FFFFFF"></div>
+                        </div>
+                        <div class="color-picker">
+                            <canvas id="colorCanvasOff" width="200" height="200"></canvas>
+                            <canvas id="hueCanvasOff" width="20" height="200"></canvas>
+                        </div>
+                        <button id="okOff">OK</button>
+                        <button id="cancelOff">Annuler</button>
+                    </div>
+                </div>
             </div>
+            <div id="status"></div>
         </div>
 
         <div class="section" style="display:block;%DISPLAY_MENU_TACTILE%">
