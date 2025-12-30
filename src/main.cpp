@@ -4,7 +4,7 @@
 // Variables générales
     String Dispo_basename = "Interrupteur"; //Pas de caractere speciaux, espaces...
     String Dispo_version = "1.0.1"; // Version du code
-    #define DEBUG  // Mets en commentaire cette ligne pour désactiver les Serial.print()
+    // #define DEBUG  // Mets en commentaire cette ligne pour désactiver les Serial.print()
     // Commande pour éviter de voir des erreurs lié au fichier .h : pio init --ide vscode
 
 
