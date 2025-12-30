@@ -6,7 +6,7 @@ const char SiteWeb_Accueil[] PROGMEM = R"rawliteral(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>%DISPO_NAME%</title>
+    <title>%SURNOM%</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -407,7 +407,7 @@ input:checked + .slider:before {
     </div>
 
     <div class="main">
-        <h1>Paramètrages</h1>
+        <h1>Paramètrages <br> <input type="text" id="surnomInput" value="%SURNOM%" style="border: none; background: transparent; font-size: inherit; font-family: inherit; color: inherit; cursor: pointer;text-align:center;" onblur="updateSurnom()" onkeydown="if(event.key==='Enter') { updateSurnom(); this.blur(); }"></h1>
 
         <div class="section">
             <h2>État de la lumière</h2>
@@ -768,6 +768,21 @@ document.getElementById("ld2410_spoiler_btn").addEventListener("click", () => {
     clearInterval(ld2410Interval);
   }
 });
+
+function updateSurnom() {
+  const surnomInput = document.getElementById("surnomInput");
+  let newsurnom = surnomInput.value
+  fetch("/option?parametre=6&surnom="+ newsurnom)
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "success") {
+          
+        }
+    })
+    .catch(error => {
+      setTimeout(() => { document.getElementById("ld2410_on_detect").checked = false; }, 100);
+    });
+}
 
 </script> <!-- Sera remplacé automatique par la page script.js de ce même répertoire -->
 </body>

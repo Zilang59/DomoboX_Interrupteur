@@ -339,6 +339,7 @@ void accueil(WebServer* activeServer) {
   // Remplacement des marqueurs pour afficher des variables
     String DispoName = Dispo_basename + "_" + ID_MAC;
     html.replace("%DISPO_NAME%", DispoName);
+    html.replace("%SURNOM%", param.Surnom);
     html.replace("%DISPLAY_MENU_ADMIN%", param.Admin_site ? "display:block;" : "display:none;");
     html.replace("%DISPLAY_MENU_TACTILE%", param.BOUTON_TACTILE_Connected ? "display:block;" : "display:none;");
 
@@ -557,6 +558,19 @@ void option(WebServer* clientServer) {       // Fonction automatique quand l'uti
         } else {
           clientServer->send(200, "application/json", "{\"status\":\"error\"}");
         }
+      }
+    }
+    if(clientServer->arg("parametre") == "6") { // Changement du Surnom
+      if(clientServer->hasArg("surnom")) {
+        String newSurnom = clientServer->arg("surnom");
+        param.Surnom = newSurnom;
+
+        // Réponse JSON pour confirmer la mise à jour
+        clientServer->send(200, "application/json", "{\"status\":\"success\"}");
+
+        delay(100);
+
+        modifJson("String", "Surnom", String(param.Surnom), PARAMETRE_FILE);
       }
     }
   }

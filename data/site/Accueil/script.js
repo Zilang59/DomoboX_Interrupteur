@@ -284,3 +284,18 @@ document.getElementById("ld2410_spoiler_btn").addEventListener("click", () => {
     clearInterval(ld2410Interval);
   }
 });
+
+function updateSurnom() {
+  const surnomInput = document.getElementById("surnomInput");
+  let newsurnom = surnomInput.value
+  fetch("/option?parametre=6&surnom="+ newsurnom)
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "success") {
+          
+        }
+    })
+    .catch(error => {
+      setTimeout(() => { document.getElementById("ld2410_on_detect").checked = false; }, 100);
+    });
+}

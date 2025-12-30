@@ -28,6 +28,7 @@
     X(float, longitude, 2.333333) \
     X(String, Sunrise, "08:00") \
     X(String, Sunset, "19:00") \
+    X(String, Surnom, "Interrupteur") \
     X(bool, empty_variable, false)
 
 // Ne pas toucher, sert au variable du PARAM_LIST
